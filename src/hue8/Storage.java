@@ -7,55 +7,70 @@ package hue8;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Storage { 
+public class Storage {
+
     private final ArrayBlockingQueue<Integer> queue;
-    
+
     private int fetchedCounter;
     private int storedCounter;
     private int underflowCounter;
     private int overflowCounter;
     private boolean productionComplete;
-    
+
     public Storage() {
-        // implement this
+        this.queue = new ArrayBlockingQueue<>(10);
+        this.fetchedCounter = 0;
+        this.storedCounter = 0;
+        this.underflowCounter = 0;
+        this.overflowCounter = 0;
+        this.productionComplete = false;
     }
-    
+
     public synchronized boolean put(Integer data) throws InterruptedException {
-        // implement this
-        return false;
+        if (!(queue.remainingCapacity() == 0)) {
+            queue.add(data);
+            storedCounter++;
+            return true;
+        } else {
+            overflowCounter++;
+            return false;
+        }
+
     }
- 
+
     public synchronized Integer get() {
-        // implement this
-        return null;
+        if (!(queue.isEmpty())) {
+            fetchedCounter++;
+            return queue.poll();
+
+        } else {
+            underflowCounter++;
+            return null;
+        }
+
     }
 
-    public boolean isProductionComplete() {
-        // implement this
-        return false;
+    public synchronized boolean isProductionComplete() {
+        return productionComplete;
     }
 
-    public void setProductionComplete() {
-        // implement this
+    public synchronized void setProductionComplete() {
+        productionComplete = true;
     }
 
     public int getFetchedCounter() {
-        // implement this
-        return -1;
+        return fetchedCounter;
     }
 
     public int getStoredCounter() {
-        // implement this
-        return -1;
+        return storedCounter;
     }
 
     public int getUnderflowCounter() {
-        // implement this
-        return -1;
+        return underflowCounter;
     }
 
     public int getOverflowCounter() {
-        // implement this
-        return -1;
+        return overflowCounter;
     }
 }
